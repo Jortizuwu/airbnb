@@ -1,31 +1,36 @@
-import { StyleSheet } from 'react-native';
+import { View } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import ListingsBottomSheet from '@/components/ListingsBottomSheet';
+import listingsData from '@/assets/data/airbnb-listings.json';
+import ListingsMap from '@/components/listings-map';
+import listingsDataGeo from '@/assets/data/airbnb-listings.geo.json';
+import { Stack } from 'expo-router';
+import { ExploreHeader } from '@/components/explore-header';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
+const Page = () => {
+  const items = useMemo(() => listingsData as any, []);
+  const getoItems = useMemo(() => listingsDataGeo, []);
+  const [category, setCategory] = useState<string>('Tiny homes');
 
-export default function TabOneScreen() {
+  const onDataChanged = (category: string) => {
+    setCategory(category);
+  };
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Tab One</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
-    </View>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <View style={{ flex: 1}}>
+        {/* Define pour custom header */}
+        <Stack.Screen
+          options={{
+            header: () => <ExploreHeader onCategoryChanged={onDataChanged} />,
+          }}
+        />
+        <ListingsMap listings={getoItems} />
+        <ListingsBottomSheet listings={items} category={category} />
+      </View>
+    </GestureHandlerRootView>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
-  },
-});
+export default Page;
